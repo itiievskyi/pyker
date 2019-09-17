@@ -25,3 +25,22 @@ class Pyker(object):
 
                 if callable(pyker_method):
                     setattr(self, method_name, pyker_method)
+
+    @property
+    def random(self):
+        return self.__random
+
+    @random.setter
+    def random(self, value):
+        self.__random = value
+
+    def seed_instance(self, seed=None):
+        """Calls random.seed"""
+        if self.__random == random:
+            self.__random = py_random.Random()
+        self.__random.seed(seed)
+        return self
+
+    @classmethod
+    def seed(cls, seed=None):
+        random.seed(seed)
