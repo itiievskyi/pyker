@@ -1,4 +1,3 @@
-from pyker.utils.loading import get_all_modules
+from pyker.utils.loading import get_all_generators
 
-GENERATORS_PATH = "pyker.generators"
-GENERATORS = get_all_modules(GENERATORS_PATH)
+GENERATORS = get_all_generators()

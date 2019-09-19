@@ -11,11 +11,12 @@ class Pyker(object):
 
     def __init__(self, **config):
         self.__random = random
-        self.generators = GENERATORS
+        self.__generators = GENERATORS
 
         for generator in GENERATORS:
-            # for every generator (provider) list all methods
+            # for every generator list all methods
             # and set them as callable public methods of Pyker instance
+            generator = generator(self.__random)
             for method_name in dir(generator):
                 # skip 'private' methods
                 if method_name.startswith("_"):
