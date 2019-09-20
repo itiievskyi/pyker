@@ -1,7 +1,7 @@
 from typing import List
 from pyker.generators import BaseGenerator
 
-# wildcart import is to detect all generators so that be able to find BaseGenerator subclasses
+# wildcart import is to detect all generators in order to be able to find BaseGenerator subclasses
 from pyker.generators import *  # noqa: 403
 
 
