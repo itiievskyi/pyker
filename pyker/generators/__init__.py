@@ -6,16 +6,18 @@ import pkgutil
 
 class BaseGenerator:
     def __init__(self, randomizer: Random):
+        from pyker.config import BATCH_LIMIT
+
         self.random = randomizer
-        self.batch_limit = 100
+        self._batch_limit = BATCH_LIMIT
 
     def set_batch_limit(self, limit: int):
         """Sets the batch limit for the cases of random batch size"""
         if limit > 0:
-            self.batch_limit = limit
+            self._batch_limit = limit
 
     def __get_batch_size(self, limit: int = None) -> int:
-        return self.random.randint(1, limit or self.batch_limit)
+        return self.random.randint(1, limit or self._batch_limit)
 
     def __create_batch(
         self, f: Callable, batch: Union[int, bool] = False
