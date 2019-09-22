@@ -1,5 +1,5 @@
 from random import Random
-from typing import List, Union
+from typing import Callable, List, Union
 import os
 import pkgutil
 
@@ -17,7 +17,9 @@ class BaseGenerator:
     def __get_batch_size(self, limit: int = None) -> int:
         return self.random.randint(1, limit or self.batch_limit)
 
-    def __create_batch(self, f, batch: Union[int, bool] = False):
+    def __create_batch(
+        self, f: Callable, batch: Union[int, bool] = False
+    ) -> Union[int, List[int]]:
         if batch is True:
             return [f() for _ in range(self.__get_batch_size())]
         elif batch > 0:
