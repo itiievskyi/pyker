@@ -1,18 +1,28 @@
 import os
 import pkgutil
 from random import Random
-from typing import Callable, List, Union
+from typing import Callable, List, Tuple, Union
 
 
 def with_batch(decorated: Callable) -> Callable:
     """Provides batch functionality for passed function (method)"""
 
-    def wrapped(self, **kwargs):
-        batch = kwargs.pop("batch", False)
+    def wrapped(
+        self: "BaseGenerator",
+        batch: Union[bool, int, Tuple[int, int]] = False,
+        **kwargs
+    ):
         if batch is True:
             return [decorated(self, **kwargs) for _ in range(self._get_batch_size())]
-        elif batch > 0:
+        elif type(batch) == int and batch > 0:
             return [decorated(self, **kwargs) for _ in range(batch)]
+        elif type(batch) == tuple:
+            start, end = batch
+            if start >= 0 and end > start:
+                return [
+                    decorated(self, **kwargs)
+                    for _ in range(self._get_batch_size(start=start, end=end))
+                ]
         return decorated(self, **kwargs)
 
     return wrapped
@@ -30,8 +40,8 @@ class BaseGenerator:
         if limit > 0:
             self._batch_limit = limit
 
-    def _get_batch_size(self, limit: int = None) -> int:
-        return self.random.randint(1, limit or self._batch_limit)
+    def _get_batch_size(self, start: int = 1, end: int = None) -> int:
+        return self.random.randint(start, end or self._batch_limit)
 
     @with_batch
     def random_digit(self, without_zero: bool = False) -> Union[int, List[int]]:
