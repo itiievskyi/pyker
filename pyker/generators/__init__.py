@@ -1,7 +1,21 @@
-from random import Random
-from typing import Callable, List, Union
 import os
 import pkgutil
+from random import Random
+from typing import Callable, List, Union
+
+
+def with_batch(decorated: Callable) -> Callable:
+    """Provides batch functionality for passed function (method)"""
+
+    def wrapped(self, **kwargs):
+        batch = kwargs.get("batch", False)
+        if batch is True:
+            return [decorated(self, **kwargs) for _ in range(self._get_batch_size())]
+        elif batch > 0:
+            return [decorated(self, **kwargs) for _ in range(batch)]
+        return decorated(self, **kwargs)
+
+    return wrapped
 
 
 class BaseGenerator:
@@ -16,20 +30,12 @@ class BaseGenerator:
         if limit > 0:
             self._batch_limit = limit
 
-    def __get_batch_size(self, limit: int = None) -> int:
+    def _get_batch_size(self, limit: int = None) -> int:
         return self.random.randint(1, limit or self._batch_limit)
 
-    def __create_batch(
-        self, f: Callable, batch: Union[int, bool] = False
-    ) -> Union[int, List[int]]:
-        if batch is True:
-            return [f() for _ in range(self.__get_batch_size())]
-        elif batch > 0:
-            return [f() for _ in range(batch)]
-        return f()
-
+    @with_batch
     def random_digit(
-        self, without_zero: bool = False, batch: Union[int, bool] = False
+        self, without_zero: bool = False, **kwargs
     ) -> Union[int, List[int]]:
         """
         Returns a random digit as integer (number).
@@ -38,7 +44,7 @@ class BaseGenerator:
         :returns: random digit (as integer), from 0 to 9 (or 1 to 9 if without_zero == True)
         """
         start_limit = int(without_zero)
-        return self.__create_batch(lambda: self.random.randint(start_limit, 9), batch)
+        return self.random.randint(start_limit, 9)
 
 
 # getting the list of generator module names for wildcard import
