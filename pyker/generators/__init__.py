@@ -8,7 +8,7 @@ def with_batch(decorated: Callable) -> Callable:
     """Provides batch functionality for passed function (method)"""
 
     def wrapped(self, **kwargs):
-        batch = kwargs.get("batch", False)
+        batch = kwargs.pop("batch", False)
         if batch is True:
             return [decorated(self, **kwargs) for _ in range(self._get_batch_size())]
         elif batch > 0:
@@ -34,9 +34,7 @@ class BaseGenerator:
         return self.random.randint(1, limit or self._batch_limit)
 
     @with_batch
-    def random_digit(
-        self, without_zero: bool = False, **kwargs
-    ) -> Union[int, List[int]]:
+    def random_digit(self, without_zero: bool = False) -> Union[int, List[int]]:
         """
         Returns a random digit as integer (number).
         `0` (zero) can be excluded by setting `without_zero` to True.
