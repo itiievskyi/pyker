@@ -27,4 +27,4 @@ class TestBatching:
 
         # providing start and end limits explicitly
         length = len(self.pyker.random_digit(batch=batch_limits))
-        assert length >= batch_limits[0] and length < batch_limits[1]
+        assert length >= batch_limits[0] and length <= batch_limits[1]
