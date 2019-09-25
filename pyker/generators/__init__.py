@@ -3,6 +3,9 @@ import pkgutil
 from random import Random
 from typing import Callable, List, Tuple, Union
 
+MAX_INT = 1000000
+MIN_INT = -MAX_INT
+
 
 def with_batch(decorated: Callable) -> Callable:
     """Provides batch functionality for passed function (method)"""
@@ -53,6 +56,15 @@ class BaseGenerator:
         """
         start_limit = int(without_zero)
         return self.random.randint(start_limit, 9)
+
+    @with_batch
+    def random_number(
+        self,
+        without_negative: bool = False,
+        limits: Tuple[int, int] = (MIN_INT, MAX_INT),
+    ) -> Union[int, List[int]]:
+        start_limit = 0 if limits[0] < 0 and without_negative else limits[0]
+        return self.random.randint(start_limit, limits[1])
 
 
 # getting the list of generator module names for wildcard import
