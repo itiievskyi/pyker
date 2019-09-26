@@ -1,38 +1,13 @@
 import os
 import pkgutil
 from random import Random
-from typing import Callable, List, Tuple, Union
+from typing import List, Tuple, Union
+
+from pyker.decorators import with_sorted_batch
 from pyker.exceptions import PykerArgumentError
 
 MAX_INT = 1000000
 MIN_INT = -MAX_INT
-
-
-def with_batch(decorated: Callable) -> Callable:
-    """Provides batch functionality for passed function (method)"""
-
-    def wrapped(
-        self: "BaseGenerator",
-        *args,
-        batch: Union[bool, int, Tuple[int, int]] = False,
-        **kwargs,
-    ):
-        if batch is True:
-            return [
-                decorated(self, *args, **kwargs) for _ in range(self._get_batch_size())
-            ]
-        elif type(batch) == int and batch > 0:
-            return [decorated(self, *args, **kwargs) for _ in range(batch)]
-        elif type(batch) == tuple:
-            start, end = batch
-            if start >= 0 and end > start:
-                return [
-                    decorated(self, *args, **kwargs)
-                    for _ in range(self._get_batch_size(start=start, end=end))
-                ]
-        return decorated(self, *args, **kwargs)
-
-    return wrapped
 
 
 class BaseGenerator:
@@ -50,7 +25,7 @@ class BaseGenerator:
     def _get_batch_size(self, start: int = 1, end: int = None) -> int:
         return self.random.randint(start, end or self._batch_limit)
 
-    @with_batch
+    @with_sorted_batch
     def random_digit(self, without_zero: bool = False) -> Union[int, List[int]]:
         """
         Returns a random digit as integer (number).
@@ -61,7 +36,7 @@ class BaseGenerator:
         start_limit = int(without_zero)
         return self.random.randint(start_limit, 9)
 
-    @with_batch
+    @with_sorted_batch
     def random_number(
         self,
         without_negative: bool = False,
@@ -73,7 +48,7 @@ class BaseGenerator:
         start_limit = 0 if start < 0 and without_negative else start
         return self.random.randint(start_limit, end)
 
-    @with_batch
+    @with_sorted_batch
     def random_number_of_length(self, length: int) -> Union[int, List[int]]:
         """Returns random positive integer of fixed length"""
         if length < 1:

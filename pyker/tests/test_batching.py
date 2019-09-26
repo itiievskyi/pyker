@@ -28,3 +28,15 @@ class TestBatching:
         # providing start and end limits explicitly
         length = len(self.pyker.random_digit(batch=batch_limits))
         assert length >= batch_limits[0] and length <= batch_limits[1]
+
+    @pytest.mark.parametrize("batch_size", [100])
+    def test_batch_sorting(self, batch_size):
+        asc_sorted_numbers = self.pyker.random_number(
+            batch=batch_size, sort_batch="asc"
+        )
+        assert asc_sorted_numbers == sorted(asc_sorted_numbers)
+
+        desc_sorted_numbers = self.pyker.random_number(
+            batch=batch_size, sort_batch="desc"
+        )
+        assert desc_sorted_numbers == sorted(desc_sorted_numbers, reverse=True)
