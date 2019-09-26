@@ -2,6 +2,7 @@ import os
 import pkgutil
 from random import Random
 from typing import Callable, List, Tuple, Union
+from pyker.exceptions import PykerArgumentError
 
 MAX_INT = 1000000
 MIN_INT = -MAX_INT
@@ -14,7 +15,7 @@ def with_batch(decorated: Callable) -> Callable:
         self: "BaseGenerator",
         *args,
         batch: Union[bool, int, Tuple[int, int]] = False,
-        **kwargs
+        **kwargs,
     ):
         if batch is True:
             return [
@@ -76,6 +77,9 @@ class BaseGenerator:
             return self.random_digit()
         elif length > 1:
             return self.random.randint(pow(10, length - 1), pow(10, length) - 1)
+        raise PykerArgumentError(
+            f"Argument `length` accepts only positive integers, but `{length}` was provided."
+        )
 
 
 # getting the list of generator module names for wildcard import
