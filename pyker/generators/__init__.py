@@ -12,21 +12,24 @@ def with_batch(decorated: Callable) -> Callable:
 
     def wrapped(
         self: "BaseGenerator",
+        *args,
         batch: Union[bool, int, Tuple[int, int]] = False,
         **kwargs
     ):
         if batch is True:
-            return [decorated(self, **kwargs) for _ in range(self._get_batch_size())]
+            return [
+                decorated(self, *args, **kwargs) for _ in range(self._get_batch_size())
+            ]
         elif type(batch) == int and batch > 0:
-            return [decorated(self, **kwargs) for _ in range(batch)]
+            return [decorated(self, *args, **kwargs) for _ in range(batch)]
         elif type(batch) == tuple:
             start, end = batch
             if start >= 0 and end > start:
                 return [
-                    decorated(self, **kwargs)
+                    decorated(self, *args, **kwargs)
                     for _ in range(self._get_batch_size(start=start, end=end))
                 ]
-        return decorated(self, **kwargs)
+        return decorated(self, *args, **kwargs)
 
     return wrapped
 
@@ -65,6 +68,14 @@ class BaseGenerator:
     ) -> Union[int, List[int]]:
         start_limit = 0 if limits[0] < 0 and without_negative else limits[0]
         return self.random.randint(start_limit, limits[1])
+
+    @with_batch
+    def random_number_of_length(self, length: int) -> int:
+        """Returns random positive integer of fixed length"""
+        if length == 1:
+            return self.random_digit()
+        elif length > 1:
+            return self.random.randint(pow(10, length - 1), pow(10, length) - 1)
 
 
 # getting the list of generator module names for wildcard import
