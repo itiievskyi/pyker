@@ -67,19 +67,23 @@ class BaseGenerator:
         without_negative: bool = False,
         limits: Tuple[int, int] = (MIN_INT, MAX_INT),
     ) -> Union[int, List[int]]:
-        start_limit = 0 if limits[0] < 0 and without_negative else limits[0]
-        return self.random.randint(start_limit, limits[1])
+        start, end = limits
+        if start >= end:
+            raise PykerArgumentError(f"Start point should be smaller than end limit")
+        start_limit = 0 if start < 0 and without_negative else start
+        return self.random.randint(start_limit, end)
 
     @with_batch
-    def random_number_of_length(self, length: int) -> int:
+    def random_number_of_length(self, length: int) -> Union[int, List[int]]:
         """Returns random positive integer of fixed length"""
+        if length < 1:
+            raise PykerArgumentError(
+                f"Argument `length` accepts only positive numbers, but `{length}` was provided."
+            )
         if length == 1:
             return self.random_digit()
         elif length > 1:
             return self.random.randint(pow(10, length - 1), pow(10, length) - 1)
-        raise PykerArgumentError(
-            f"Argument `length` accepts only positive integers, but `{length}` was provided."
-        )
 
 
 # getting the list of generator module names for wildcard import
