@@ -119,3 +119,25 @@ class TestRandomMethods:
             )  # batch size > original size
         with pytest.raises(PykerArgumentError):
             assert self.pyker.multiple_choice([])  # empty sequence
+
+    @pytest.mark.parametrize(
+        "test_string, test_list", [("abcdefg", [1, 2, 3, 4, 5, 6])]
+    )
+    def test_random_sequence(self, test_string, test_list):
+        str_seq = self.pyker.random_sequence(test_string)
+        assert len(str_seq) <= len(test_string)
+        assert str_seq in test_string
+
+        list_seq = self.pyker.random_sequence(test_list)
+        for index in range(len(list_seq)):
+            if index > 0:
+                assert (
+                    test_list.index(list_seq[index])
+                    == test_list.index(list_seq[index - 1]) + 1
+                )
+
+        # exceptions
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.random_sequence(
+                test_string, length=len(test_string) + 1
+            )  # too long sequence

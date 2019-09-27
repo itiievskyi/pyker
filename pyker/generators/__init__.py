@@ -98,8 +98,28 @@ class BaseGenerator:
             return self.random.sample(original_object, new_size)
         except ValueError:
             raise PykerArgumentError(
-                "Batch size cannot be negative or exceed the size of original list."
+                "Batch size cannot be negative or exceed the size of original object."
             )
+
+    def random_sequence(
+        self, elements: Iterable[Any], length: Optional[int] = None
+    ) -> Iterable[Any]:
+        """Returns a random sequence from iterable object"""
+
+        original_object = get_subscriptable_object(elements)
+        object_length = len(original_object)
+
+        seq_length = (
+            length if length is not None else self.random.randint(1, object_length)
+        )
+
+        if seq_length > object_length or seq_length < 1:
+            raise PykerArgumentError(
+                "Sequence size cannot be less than 1 or exceed the size of original object."
+            )
+
+        start = self.random.randint(0, object_length - seq_length)
+        return original_object[start : start + seq_length]
 
 
 # getting the list of generator module names for wildcard import
