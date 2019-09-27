@@ -141,3 +141,11 @@ class TestRandomMethods:
             assert self.pyker.random_sequence(
                 test_string, length=len(test_string) + 1
             )  # too long sequence
+
+    @pytest.mark.parametrize("test_list", [[1, 2, 3, 4, 5, 6]])
+    def test_shuffle_list(self, test_list):
+        new_list = [*test_list]
+        self.pyker.shuffle_list(new_list)
+        assert isinstance(new_list, list)
+        assert len(new_list) == len(test_list)
+        assert set(new_list) == set(test_list)

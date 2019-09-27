@@ -121,6 +121,15 @@ class BaseGenerator:
         start = self.random.randint(0, object_length - seq_length)
         return original_object[start : start + seq_length]
 
+    def shuffle_list(self, elements: List) -> List:
+        """Shuffles elements of the list"""
+        try:
+            new_list = elements[:]  # creating a shallow copy of the list
+            self.random.shuffle(elements)  # in-place shuffling
+            return new_list
+        except (KeyError, TypeError):
+            raise PykerArgumentError("Only list can be used for shuffling.")
+
 
 # getting the list of generator module names for wildcard import
 __all__ = list(
