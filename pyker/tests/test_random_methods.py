@@ -1,4 +1,5 @@
 import pytest
+import string
 
 from pyker import Pyker
 from pyker.exceptions import PykerArgumentError
@@ -50,3 +51,21 @@ class TestRandomMethods:
         # testing exception for negative length
         with pytest.raises(PykerArgumentError):
             assert self.pyker.random_number_of_length(-10)
+
+    @pytest.mark.parametrize("batch", [100])
+    def test_random_letters(self, batch):
+        # single letter
+        assert self.pyker.random_letter() in string.ascii_letters
+        assert self.pyker.random_uppercase_letter() in string.ascii_uppercase
+        assert self.pyker.random_lowercase_letter() in string.ascii_lowercase
+
+        # batch
+        assert set(self.pyker.random_letter(batch=batch)).issubset(
+            set(string.ascii_letters)
+        )
+        assert set(self.pyker.random_uppercase_letter(batch=batch)).issubset(
+            set(string.ascii_uppercase)
+        )
+        assert set(self.pyker.random_lowercase_letter(batch=batch)).issubset(
+            set(string.ascii_lowercase)
+        )

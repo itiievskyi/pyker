@@ -1,9 +1,10 @@
 import os
 import pkgutil
+import string
 from random import Random
 from typing import List, Tuple, Union
 
-from pyker.decorators import with_sorted_batch
+from pyker.decorators import with_batch, with_sorted_batch
 from pyker.exceptions import PykerArgumentError
 
 MAX_INT = 1000000
@@ -59,6 +60,21 @@ class BaseGenerator:
             return self.random_digit()
         elif length > 1:
             return self.random.randint(pow(10, length - 1), pow(10, length) - 1)
+
+    @with_batch
+    def random_letter(self) -> Union[str, List[str]]:
+        """Returns random letter from ASCII set (a-z plus A-Z)"""
+        return self.random.choice(string.ascii_letters)
+
+    @with_batch
+    def random_uppercase_letter(self) -> Union[str, List[str]]:
+        """Returns random uppercase letter from ASCII set (A-Z)"""
+        return self.random.choice(string.ascii_uppercase)
+
+    @with_batch
+    def random_lowercase_letter(self) -> Union[str, List[str]]:
+        """Returns random lowercase letter from ASCII set (a-z)"""
+        return self.random.choice(string.ascii_lowercase)
 
 
 # getting the list of generator module names for wildcard import
