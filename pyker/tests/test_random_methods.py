@@ -69,3 +69,53 @@ class TestRandomMethods:
         assert set(self.pyker.random_lowercase_letter(batch=batch)).issubset(
             set(string.ascii_lowercase)
         )
+
+    def test_random_choice(self):
+        # single element
+        assert self.pyker.random_choice("abc") in "abc"
+        assert self.pyker.random_choice(set([1, 3, 5, 7, 1, 4, 3])) in [
+            1,
+            3,
+            5,
+            7,
+            1,
+            4,
+            3,
+        ]
+        assert self.pyker.random_choice([1, 2, "str", True]) in [1, 2, "str", True]
+        assert self.pyker.random_choice((1, 2, 3)) in (1, 2, 3)
+        assert (
+            self.pyker.random_choice({1: "a", 2: "b", 3: "c"})
+            in {1: "a", 2: "b", 3: "c"}.items()
+        )
+
+        # exceptions
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.random_choice(10)  # number is not iterable
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.random_choice("")  # empty sequence
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.random_choice([])  # empty sequence
+
+    def test_multiple_choice(self):
+        original_list = [1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 1, 2, 4]
+
+        random_list = self.pyker.multiple_choice(original_list)
+        assert isinstance(random_list, list)
+        assert len(random_list) <= len(original_list)
+
+        fixed_size_list = self.pyker.multiple_choice(original_list, size=5)
+        assert len(fixed_size_list) == 5
+
+        unique_list = self.pyker.multiple_choice(original_list, unique=True)
+        assert len(unique_list) == len(set(unique_list))
+
+        # exceptions
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.multiple_choice(original_list, -2)  # negative batch size
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.multiple_choice(
+                original_list, len(original_list) + 1
+            )  # batch size > original size
+        with pytest.raises(PykerArgumentError):
+            assert self.pyker.multiple_choice([])  # empty sequence

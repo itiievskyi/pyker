@@ -2,10 +2,11 @@ import os
 import pkgutil
 import string
 from random import Random
-from typing import List, Tuple, Union
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
 from pyker.decorators import with_batch, with_sorted_batch
 from pyker.exceptions import PykerArgumentError
+from pyker.utils.get_subscriptable_object import get_subscriptable_object
 
 MAX_INT = 1000000
 MIN_INT = -MAX_INT
@@ -75,6 +76,30 @@ class BaseGenerator:
     def random_lowercase_letter(self) -> Union[str, List[str]]:
         """Returns random lowercase letter from ASCII set (a-z)"""
         return self.random.choice(string.ascii_lowercase)
+
+    def random_choice(self, elements: Iterable[Any]) -> Any:
+        """Returns random element from iterable object"""
+        return self.random.choice(get_subscriptable_object(elements))
+
+    def multiple_choice(
+        self, elements: Iterable[Any], size: Optional[int] = None, unique: bool = False
+    ) -> Iterable[Any]:
+        """Returns a list containing several random elements from iterable object"""
+
+        original_object = (
+            get_subscriptable_object(elements)
+            if not unique
+            else set(get_subscriptable_object(elements))
+        )
+        object_length = len(original_object)
+        new_size = size if size is not None else self.random.randint(0, object_length)
+
+        try:
+            return self.random.sample(original_object, new_size)
+        except ValueError:
+            raise PykerArgumentError(
+                "Batch size cannot be negative or exceed the size of original list."
+            )
 
 
 # getting the list of generator module names for wildcard import
