@@ -1,5 +1,7 @@
-from pyker.config import GENERATORS
 from pyker.randomizer import RandomMixin
+from pyker.utils.loading import get_all_generators
+
+GENERATORS = get_all_generators()
 
 
 class Pyker(RandomMixin, object):

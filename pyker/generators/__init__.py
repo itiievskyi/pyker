@@ -13,10 +13,11 @@ MIN_INT = -MAX_INT
 
 
 class BaseGenerator:
-    def __init__(self, randomizer: Random):
+    def __init__(self, randomizer: Random, locale: str = "en_US"):
         from pyker.config import BATCH_LIMIT
 
         self.random = randomizer
+        self.locale = locale
         self._batch_limit = BATCH_LIMIT
 
     def set_batch_limit(self, limit: int):
@@ -26,6 +27,15 @@ class BaseGenerator:
 
     def _get_batch_size(self, start: int = 1, end: int = None) -> int:
         return self.random.randint(start, end or self._batch_limit)
+
+    def _probability_choice(
+        self, elements: List[Tuple[Any, float]], length: int = 1
+    ) -> Union[List[Any], Any]:
+        """Returns random element(s) based on weights"""
+        items = [group[0] for group in elements]
+        weights = [group[1] for group in elements]
+        choices = self.random.choices(items, weights=weights, length=length)
+        return choices if length > 1 else next(choices)
 
     @with_sorted_batch
     def random_digit(self, without_zero: bool = False) -> Union[int, List[int]]:
