@@ -60,6 +60,20 @@ class PersonGenerator(BaseGenerator):
                 f"Error. No valid placeholders found in template: {t.template}."
             )
 
+        if (
+            not all([key.endswith("_male") for key in keys])
+            and not all([key.endswith("_female") for key in keys])
+            and not all(["male" not in key for key in keys])
+        ):
+            raise PykerArgumentError(
+                f"Invalid template: `{t.template}`. Use consistent placeholders (male, female or none)."
+            )
+        elif not all(["male" in key for key in keys]) and not all(
+            ["_female" in key for key in keys]
+        ):
+            gender = self.random_choice(["_male", "_female"])
+            keys = [f"{key}{gender}" for key in keys]
+            
         kwargs = {}
         reserved_middle_name = ""
         for key in keys:
@@ -83,30 +97,42 @@ class PersonGenerator(BaseGenerator):
         return t.substitute(kwargs)
 
     @with_sorted_batch
-    def name_from_template(template: str) -> str:
+    def name_from_template(self, template: str) -> str:
         """Creates random name based on given string template.
         For example, template `$prefix $first_name $last_name` will be filled with random elements from `prefix`, `first_name` and `last_name` lists.
         """
         return self._get_random_name(Template(template))
-    
+
     @with_sorted_batch
     def name(self) -> str:
         """Creates random name. Includes only first name and last name."""
-        templates_to_choose = [t for t in self.data.templates if (not t.prefix and not t.middle_name and not t.suffix)]
+        templates_to_choose = [
+            t
+            for t in self.data.templates
+            if (not t.prefix and not t.middle_name and not t.suffix)
+        ]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
-    
+
     @with_sorted_batch
     def name_male(self) -> str:
         """Creates random male name. Includes only first name and last name."""
-        templates_to_choose = [t for t in self.data.templates_male if (not t.prefix and not t.middle_name and not t.suffix)]
+        templates_to_choose = [
+            t
+            for t in self.data.templates_male
+            if (not t.prefix and not t.middle_name and not t.suffix)
+        ]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
-    
+
     @with_sorted_batch
     def name_female(self) -> str:
         """Creates random female name. Includes only first name and last name."""
-        templates_to_choose = [t for t in self.data.templates_female if (not t.prefix and not t.middle_name and not t.suffix)]
+        templates_to_choose = [
+            t
+            for t in self.data.templates_female
+            if (not t.prefix and not t.middle_name and not t.suffix)
+        ]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
 
@@ -131,74 +157,74 @@ class PersonGenerator(BaseGenerator):
     @with_sorted_batch
     def first_name(self) -> str:
         """Returns random first name."""
-        return self._get_random_localized_attribute('first_name')
+        return self._get_random_localized_attribute("first_name")
 
     @with_sorted_batch
     def first_name_male(self) -> str:
         """Returns random male first name."""
-        return self._get_random_localized_attribute('first_name_male')
+        return self._get_random_localized_attribute("first_name_male")
 
     @with_sorted_batch
     def first_name_female(self) -> str:
         """Returns random female first name."""
-        return self._get_random_localized_attribute('first_name_female')
+        return self._get_random_localized_attribute("first_name_female")
 
     @with_sorted_batch
     def last_name(self) -> str:
         """Returns random last name."""
-        return self._get_random_localized_attribute('last_name')
+        return self._get_random_localized_attribute("last_name")
 
     @with_sorted_batch
     def last_name_male(self) -> str:
         """Returns random male last name."""
-        return self._get_random_localized_attribute('last_name_male')
+        return self._get_random_localized_attribute("last_name_male")
 
     @with_sorted_batch
     def last_name_female(self) -> str:
         """Returns random female last name."""
-        return self._get_random_localized_attribute('last_name_female')
+        return self._get_random_localized_attribute("last_name_female")
 
     @with_sorted_batch
     def middle_name(self) -> str:
         """Returns random last name."""
-        return self._get_random_localized_attribute('middle_name')
+        return self._get_random_localized_attribute("middle_name")
 
     @with_sorted_batch
     def middle_name_male(self) -> str:
         """Returns random male last name."""
-        return self._get_random_localized_attribute('middle_name_male')
+        return self._get_random_localized_attribute("middle_name_male")
 
     @with_sorted_batch
     def middle_name_female(self) -> str:
         """Returns random female last name."""
-        return self._get_random_localized_attribute('middle_name_female')
+        return self._get_random_localized_attribute("middle_name_female")
 
     @with_sorted_batch
     def prefix(self) -> str:
         """Returns random name prefix."""
-        return self._get_random_localized_attribute('prefix')
+        return self._get_random_localized_attribute("prefix")
 
     @with_sorted_batch
     def prefix_male(self) -> str:
         """Returns random male name prefix."""
-        return self._get_random_localized_attribute('prefix_male')
+        return self._get_random_localized_attribute("prefix_male")
 
     @with_sorted_batch
     def prefix_female(self) -> str:
         """Returns random female name prefix."""
-        return self._get_random_localized_attribute('prefix_female')
+        return self._get_random_localized_attribute("prefix_female")
 
     @with_sorted_batch
     def suffix(self) -> str:
         """Returns random name suffix."""
-        return self._get_random_localized_attribute('suffix')
+        return self._get_random_localized_attribute("suffix")
 
     @with_sorted_batch
     def suffix_male(self) -> str:
         """Returns random male name suffix."""
-        return self._get_random_localized_attribute('suffix_male')
+        return self._get_random_localized_attribute("suffix_male")
 
     @with_sorted_batch
     def suffix_female(self) -> str:
         """Returns random female name suffix."""
-        return self._get_random_localized_attribute('suffix_female')
+        return self._get_random_localized_attribute("suffix_female")
