@@ -71,7 +71,7 @@ suffix_male = ["Jr.", "II", "III", "PhD"]
 prefix_male = ["Sir", "Mr."]
 
 first_name_female = ["Sara", "Amy"]
-last_name_female = ["Connor", "Scott"]
+last_name_female = last_name_male
 middle_name_female = first_name_female
 suffix_female = ["MD", "PhD"]
 prefix_female = ["Miss", "Mrs."]

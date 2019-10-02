@@ -23,7 +23,9 @@ class PersonGenerator(BaseGenerator):
                     f"Failed to load both `{self.locale}` and `{DEFAULT_LOCALE}` (default) locales."
                 )
 
-    def _create_template(self, structure) -> Template:
+    def _create_name_template(self, templates) -> Template:
+        weights = [t._weight for t in templates]
+        structure = self.random.choices(templates, weights=weights, k=1)[0]
         gender = "male" if structure._male else "female"
         placeholders = [
             f"${attribute}_{gender}"
@@ -67,11 +69,32 @@ class PersonGenerator(BaseGenerator):
                 )
         return t.substitute(kwargs)
 
-    def name(self, template: Optional[str] = None) -> str:
-        if template:
-            return self._get_random_name(Template(template))
-        weights = [t._weight for t in self.data.templates]
-        template = self.random.choices(self.data.templates, weights=weights, k=1)[0]
-        string_template = self._create_template(template)
+    def name_from_template(template: str) -> str:
+        return self._get_random_name(Template(template))
+
+    def name(self) -> str:
+        templates_to_choose = [t for t in self.data.templates if (not t.prefix and not t.middle_name and not t.suffix)]
+        string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
 
+    def name_male(self) -> str:
+        templates_to_choose = [t for t in self.data.templates_male if (not t.prefix and not t.middle_name and not t.suffix)]
+        string_template = self._create_name_template(templates_to_choose)
+        return self._get_random_name(string_template)
+    
+    def name_female(self) -> str:
+        templates_to_choose = [t for t in self.data.templates_female if (not t.prefix and not t.middle_name and not t.suffix)]
+        string_template = self._create_name_template(templates_to_choose)
+        return self._get_random_name(string_template)
+
+    def full_name(self) -> str:
+        string_template = self._create_name_template(self.data.templates)
+        return self._get_random_name(string_template)
+
+    def full_name_male(self) -> str:
+        string_template = self._create_name_template(self.data.templates_male)
+        return self._get_random_name(string_template)
+
+    def full_name_female(self) -> str:
+        string_template = self._create_name_template(self.data.templates_female)
+        return self._get_random_name(string_template)
