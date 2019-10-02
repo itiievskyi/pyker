@@ -1,9 +1,10 @@
 import importlib
 import re
 from string import Template
-from typing import Optional
+from typing import Any, Optional
 
 from pyker.config import DEFAULT_LOCALE
+from pyker.decorators import with_batch, with_sorted_batch
 from pyker.exceptions import PykerArgumentError, PykerLocalizationError
 from pyker.generators import BaseGenerator
 
@@ -34,6 +35,14 @@ class PersonGenerator(BaseGenerator):
         ]
         return Template(" ".join(placeholders))
 
+    def _get_random_localized_attribute(self, key: str) -> Any:
+        try:
+            return self.random_choice(getattr(self.data, key))
+        except AttributeError:
+            raise PykerLocalizationError(
+                f"`{key}` is unavailable for current locale: `{self.generator_locale}`"
+            )
+
     def _get_random_name(self, t: Template) -> str:
         try:
             keys = [group[1] for group in t.pattern.findall(t.template) if group[1]]
@@ -62,39 +71,106 @@ class PersonGenerator(BaseGenerator):
                 ) == getattr(self.data, key.replace("middle", "first")):
                     kwargs[key] = reserved_middle_name
                 else:
-                    kwargs[key] = self.random_choice(getattr(self.data, key))
+                    kwargs[key] = self._get_random_localized_attribute(key)
             except AttributeError:
                 raise PykerLocalizationError(
                     f"`{key}` is unavailable for current locale: `{self.generator_locale}`"
                 )
         return t.substitute(kwargs)
 
+    @with_sorted_batch
     def name_from_template(template: str) -> str:
         return self._get_random_name(Template(template))
-
+    
+    @with_sorted_batch
     def name(self) -> str:
         templates_to_choose = [t for t in self.data.templates if (not t.prefix and not t.middle_name and not t.suffix)]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
-
+    
+    @with_sorted_batch
     def name_male(self) -> str:
         templates_to_choose = [t for t in self.data.templates_male if (not t.prefix and not t.middle_name and not t.suffix)]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
     
+    @with_sorted_batch
     def name_female(self) -> str:
         templates_to_choose = [t for t in self.data.templates_female if (not t.prefix and not t.middle_name and not t.suffix)]
         string_template = self._create_name_template(templates_to_choose)
         return self._get_random_name(string_template)
 
+    @with_batch
     def full_name(self) -> str:
         string_template = self._create_name_template(self.data.templates)
         return self._get_random_name(string_template)
 
+    @with_batch
     def full_name_male(self) -> str:
         string_template = self._create_name_template(self.data.templates_male)
         return self._get_random_name(string_template)
 
+    @with_batch
     def full_name_female(self) -> str:
         string_template = self._create_name_template(self.data.templates_female)
         return self._get_random_name(string_template)
+
+    @with_sorted_batch
+    def first_name(self) -> str:
+        return self._get_random_localized_attribute('first_name')
+
+    @with_sorted_batch
+    def first_name_male(self) -> str:
+        return self._get_random_localized_attribute('first_name_male')
+
+    @with_sorted_batch
+    def first_name_female(self) -> str:
+        return self._get_random_localized_attribute('first_name_female')
+
+    @with_sorted_batch
+    def last_name(self) -> str:
+        return self._get_random_localized_attribute('last_name')
+
+    @with_sorted_batch
+    def last_name_male(self) -> str:
+        return self._get_random_localized_attribute('last_name_male')
+
+    @with_sorted_batch
+    def last_name_female(self) -> str:
+        return self._get_random_localized_attribute('last_name_female')
+
+    @with_sorted_batch
+    def middle_name(self) -> str:
+        return self._get_random_localized_attribute('middle_name')
+
+    @with_sorted_batch
+    def middle_name_male(self) -> str:
+        return self._get_random_localized_attribute('middle_name_male')
+
+    @with_sorted_batch
+    def middle_name_female(self) -> str:
+        return self._get_random_localized_attribute('middle_name_female')
+
+    @with_sorted_batch
+    def prefix(self) -> str:
+        return self._get_random_localized_attribute('prefix')
+
+    @with_sorted_batch
+    def prefix_male(self) -> str:
+        return self._get_random_localized_attribute('prefix_male')
+
+    @with_sorted_batch
+    def prefix_female(self) -> str:
+        return self._get_random_localized_attribute('prefix_female')
+
+    @with_sorted_batch
+    def suffix(self) -> str:
+        return self._get_random_localized_attribute('suffix')
+
+    @with_sorted_batch
+    def suffix_male(self) -> str:
+        return self._get_random_localized_attribute('suffix_male')
+
+    @with_sorted_batch
+    def suffix_female(self) -> str:
+        return self._get_random_localized_attribute('suffix_female')

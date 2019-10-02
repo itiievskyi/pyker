@@ -62,7 +62,6 @@ templates_female = [
     ),
 ]
 
-templates = [*templates_male, *templates_female]
 
 first_name_male = ["John", "Kevin"]
 last_name_male = ["Smith", "Simpson"]
@@ -75,3 +74,10 @@ last_name_female = last_name_male
 middle_name_female = first_name_female
 suffix_female = ["MD", "PhD"]
 prefix_female = ["Miss", "Mrs."]
+
+templates = [*templates_male, *templates_female]
+first_name = [*first_name_male, *first_name_female]
+last_name = [*last_name_male, *last_name_female]
+middle_name = [*middle_name_male, *middle_name_female]
+prefix = [*prefix_male, *prefix_female]
+suffix = [*suffix_male, *suffix_female]
