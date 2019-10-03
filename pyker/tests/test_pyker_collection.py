@@ -4,6 +4,7 @@ import sys
 import inspect
 
 from pyker import Pyker, generators
+from pyker.generators import BaseGenerator
 
 
 def test_method_collection():
@@ -26,7 +27,10 @@ def test_method_collection():
         module = importlib.import_module(f"pyker.generators.{module_name}")
         module_classes.update(
             dict(
-                inspect.getmembers(sys.modules[module.__name__], inspect.isclass)
+                inspect.getmembers(
+                    sys.modules[module.__name__],
+                    lambda cls: inspect.isclass(cls) and issubclass(cls, BaseGenerator),
+                )
             ).values()
         )
 

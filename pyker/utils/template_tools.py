@@ -25,3 +25,14 @@ def get_template_keys(t: Template, possible_keys: List[str]) -> List[str]:
             )
 
     return keys
+
+
+def fill_template(template: Template, data: dict) -> str:
+    """Checks placeholders for errors and returns string Template object"""
+    try:
+        return template.substitute(data)
+    except ValueError:
+        raise PykerArgumentError(
+            f"Invalid template format. Use only valid string with placeholders of type `$<string>`.\
+                Dollar sign should be escaped: `$$`."
+        )

@@ -6,7 +6,7 @@ from pyker.config import DEFAULT_LOCALE
 from pyker.decorators import with_batch, with_sorted_batch
 from pyker.exceptions import PykerArgumentError, PykerLocalizationError
 from pyker.generators import BaseGenerator
-from pyker.utils.template_tools import get_template_keys
+from pyker.utils.template_tools import get_template_keys, fill_template
 
 from .config import POSSIBLE_KEYS, PersonName
 
@@ -70,7 +70,7 @@ class PersonGenerator(BaseGenerator):
                 raise PykerLocalizationError(
                     f"`{key}` is unavailable for current locale: `{self.generator_locale}`."
                 )
-        return t.substitute(kwargs)
+        return fill_template(t, kwargs)
 
     @with_sorted_batch
     def name_from_template(self, template: str) -> str:
