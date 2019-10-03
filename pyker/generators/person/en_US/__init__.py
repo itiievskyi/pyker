@@ -8,7 +8,6 @@ Provide lists of name parts here:
 """
 
 from ..config import PersonName
-from string import Template
 
 templates_male = [
     PersonName(_male=True, first_name=True, last_name=True, _weight=25),

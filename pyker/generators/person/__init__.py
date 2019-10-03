@@ -1,5 +1,4 @@
 import importlib
-import re
 from string import Template
 from typing import Any, List, Optional
 
@@ -7,7 +6,9 @@ from pyker.config import DEFAULT_LOCALE
 from pyker.decorators import with_batch, with_sorted_batch
 from pyker.exceptions import PykerArgumentError, PykerLocalizationError
 from pyker.generators import BaseGenerator
-from .config import PersonName
+from pyker.utils.template_tools import get_template_keys
+
+from .config import POSSIBLE_KEYS, PersonName
 
 
 class PersonGenerator(BaseGenerator):
@@ -46,34 +47,9 @@ class PersonGenerator(BaseGenerator):
                 f"`{key}` is unavailable for current locale: `{self.generator_locale}`"
             )
 
-    def _get_random_name(self, t: Template) -> str:
+    def _get_random_name(self, t: Template, keys: Optional[List[str]] = None) -> str:
         """Fills given string template with random elements from name parts (based on placeholders)."""
-        try:
-            keys = [group[1] for group in t.pattern.findall(t.template) if group[1]]
-        except (StopIteration, IndexError):
-            raise PykerArgumentError(
-                f"Error. No valid placeholders found in template: {t.template}."
-            )
-
-        if not len(keys):
-            raise PykerArgumentError(
-                f"Error. No valid placeholders found in template: {t.template}."
-            )
-
-        if (
-            not all([key.endswith("_male") for key in keys])
-            and not all([key.endswith("_female") for key in keys])
-            and not all(["male" not in key for key in keys])
-        ):
-            raise PykerArgumentError(
-                f"Invalid template: `{t.template}`. Use consistent placeholders (male, female or none)."
-            )
-        elif not all(["male" in key for key in keys]) and not all(
-            ["_female" in key for key in keys]
-        ):
-            gender = self.random_choice(["_male", "_female"])
-            keys = [f"{key}{gender}" for key in keys]
-            
+        keys = keys or get_template_keys(t, POSSIBLE_KEYS)
         kwargs = {}
         reserved_middle_name = ""
         for key in keys:
@@ -92,7 +68,7 @@ class PersonGenerator(BaseGenerator):
                     kwargs[key] = self._get_random_localized_attribute(key)
             except AttributeError:
                 raise PykerLocalizationError(
-                    f"`{key}` is unavailable for current locale: `{self.generator_locale}`"
+                    f"`{key}` is unavailable for current locale: `{self.generator_locale}`."
                 )
         return t.substitute(kwargs)
 
@@ -101,7 +77,26 @@ class PersonGenerator(BaseGenerator):
         """Creates random name based on given string template.
         For example, template `$prefix $first_name $last_name` will be filled with random elements from `prefix`, `first_name` and `last_name` lists.
         """
-        return self._get_random_name(Template(template))
+        string_template = Template(template)
+        keys = get_template_keys(string_template, POSSIBLE_KEYS)
+        if (
+            not all([key.endswith("_male") for key in keys])
+            and not all([key.endswith("_female") for key in keys])
+            and not all(["male" not in key for key in keys])
+        ):
+            raise PykerArgumentError(
+                f"Invalid template: `{string_template.template}`. Use consistent placeholders (male, female or none)."
+            )
+        elif not all(["male" in key for key in keys]) and not all(
+            ["_female" in key for key in keys]
+        ):
+            gender = self.random_choice(["_male", "_female"])
+            new_keys = [f"{key}{gender}" for key in keys]
+            for i in range(len(keys)):
+                template = template.replace(keys[i], new_keys[i])
+            return self._get_random_name(Template(template), new_keys)
+
+        return self._get_random_name(string_template, keys)
 
     @with_sorted_batch
     def name(self) -> str:
