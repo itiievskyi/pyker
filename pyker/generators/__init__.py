@@ -1,5 +1,6 @@
 import os
 import pkgutil
+import re
 import string
 from random import Random
 from typing import Any, Iterable, List, Optional, Tuple, Union
@@ -10,6 +11,8 @@ from pyker.utils.get_subscriptable_object import get_subscriptable_object
 
 MAX_INT = 1000000
 MIN_INT = -MAX_INT
+
+_re_hash = re.compile(r'#')
 
 
 class BaseGenerator:
@@ -130,6 +133,13 @@ class BaseGenerator:
             return new_list
         except (KeyError, TypeError):
             raise PykerArgumentError("Only list can be used for shuffling.")
+
+    def numerify(self, text: str) -> str:
+        """Replaces all '#' occurences in the given string with random digits (0-9)"""
+        return _re_hash.sub(
+            lambda x: str(self.random_digit()),
+            text)
+
 
 
 # getting the list of generator module names for wildcard import
