@@ -1,1 +1,3 @@
-# pyker
+# Pyker - powerful faker for Python 3.7+
+
+Work in progress...
